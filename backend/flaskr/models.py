@@ -6,12 +6,10 @@ database_name = "postgres"
 database_path = "postgres://postgres:admin@{}/{}".format('localhost:5432', database_name)
 db = SQLAlchemy()
 
-'''
-setup_db(app)
-    binds a flask application and a SQLAlchemy service
-'''
 
-
+# ----------------------------------------------------------------------------#
+# HELPER METHOD TO SETUP DB
+# ----------------------------------------------------------------------------#
 def setup_db(app, database_path=database_path):
     app.config["SQLALCHEMY_DATABASE_URI"] = database_path
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -20,12 +18,9 @@ def setup_db(app, database_path=database_path):
     db.create_all()
 
 
-'''
-Question
-
-'''
-
-
+# ----------------------------------------------------------------------------#
+# QUESTIONS MODEL
+# ----------------------------------------------------------------------------#
 class Question(db.Model):
     __tablename__ = 'questions'
 
@@ -62,12 +57,9 @@ class Question(db.Model):
         }
 
 
-'''
-Category
-
-'''
-
-
+# ----------------------------------------------------------------------------#
+# CATEGORIES MODEL
+# ----------------------------------------------------------------------------#
 class Category(db.Model):
     __tablename__ = 'categories'
 

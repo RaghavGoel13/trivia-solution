@@ -12,6 +12,13 @@ from models import setup_db, Category, Question
 # ----------------------------------------------------------------------------#
 # App Config.
 # ----------------------------------------------------------------------------#
+app = Flask(__name__)
+setup_db(app)
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+# ----------------------------------------------------------------------------#
+# PAGINATION LOGIC
+# ----------------------------------------------------------------------------#
 QUES_PER_PAGE = 10
 
 
@@ -24,13 +31,9 @@ def paginate_questions(request, selection):
     return current_questions
 
 
-app = Flask(__name__)
-setup_db(app)
-# CORS(app)
-
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
-
-
+# ----------------------------------------------------------------------------#
+# AFTER REQUEST
+# ----------------------------------------------------------------------------#
 @app.after_request
 def after_request(response):
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
@@ -38,6 +41,9 @@ def after_request(response):
     return response
 
 
+# ----------------------------------------------------------------------------#
+# GET CATEGORIES ENDPOINT
+# ----------------------------------------------------------------------------#
 @app.route('/categories', methods=['GET'])
 def retrieve_categories():
     categories = Category.query.order_by(Category.type).all()
@@ -54,6 +60,9 @@ def retrieve_categories():
         })
 
 
+# ----------------------------------------------------------------------------#
+# GET QUESTIONS ENDPOINT
+# ----------------------------------------------------------------------------#
 @app.route('/questions')
 def get_questions():
     try:
@@ -80,15 +89,9 @@ def get_questions():
         abort(400)
 
 
-'''
-@TODO: 
-Create an endpoint to DELETE question using a question ID. 
-
-TEST: When you click the trash icon next to a question, the question will be removed.
-This removal will persist in the database and when you refresh the page. 
-'''
-
-
+# ----------------------------------------------------------------------------#
+# DELETE QUESTIONS ENDPOINT
+# ----------------------------------------------------------------------------#
 @app.route('/questions/<int:id>', methods=['DELETE'])
 def delete_questions(id):
     try:
@@ -106,18 +109,9 @@ def delete_questions(id):
         abort(400)
 
 
-'''
-@TODO: 
-Create an endpoint to POST a new question, 
-which will require the question and answer text, 
-category, and difficulty score.
-
-TEST: When you submit a question on the "Add" tab, 
-the form will clear and the question will appear at the end of the last page
-of the questions list in the "List" tab.  
-'''
-
-
+# ----------------------------------------------------------------------------#
+# POST QUESTIONS ENDPOINT
+# ----------------------------------------------------------------------------#
 @app.route("/questions", methods=['POST'])
 def add_question():
     body = request.get_json()
@@ -144,18 +138,9 @@ def add_question():
         abort(422)
 
 
-'''
-@TODO:
-Create a POST endpoint to get questions based on a search term.
-It should return any questions for whom the search term
-is a substring of the question.
-
-TEST: Search by any phrase. The questions list will update to include
-only question that include that string within their question.
-Try using the word "title" to start.
-'''
-
-
+# ----------------------------------------------------------------------------#
+# SEARCH QUESTIONS ENDPOINT
+# ----------------------------------------------------------------------------#
 @app.route("/search", methods=['POST'])
 def search_question():
     body = request.get_json()
@@ -173,16 +158,9 @@ def search_question():
         abort(404)
 
 
-'''
-@TODO: 
-Create a GET endpoint to get questions based on category. 
-
-TEST: In the "List" tab / main screen, clicking on one of the 
-categories in the left column will cause only questions of that 
-category to be shown. 
-'''
-
-
+# ----------------------------------------------------------------------------#
+# GET QUESTIONS BY CATEGORY ENDPOINT
+# ----------------------------------------------------------------------------#
 @app.route("/categories/<int:id>/questions")
 def questions_by_category(id):
     searched_category = Category.query.filter_by(id=id).one_or_none()
@@ -200,19 +178,9 @@ def questions_by_category(id):
         abort(404)
 
 
-'''
-@TODO: 
-Create a POST endpoint to get questions to play the quiz. 
-This endpoint should take category and previous question parameters 
-and return a random questions within the given category, 
-if provided, and that is not one of the previous questions. 
-
-TEST: In the "Play" tab, after a user selects "All" or a category,
-one question at a time is displayed, the user is allowed to answer
-and shown whether they were correct or not. 
-'''
-
-
+# ----------------------------------------------------------------------------#
+# POST QUIZ ENDPOINT
+# ----------------------------------------------------------------------------#
 @app.route('/quizzes', methods=['POST'])
 def get_quiz():
     body = request.get_json()
@@ -246,13 +214,9 @@ def get_quiz():
         abort(404)
 
 
-'''
-@TODO: 
-Create error handlers for all expected errors 
-including 404 and 422. 
-'''
-
-
+# ----------------------------------------------------------------------------#
+# ERROR HANDLERS FOR HTTP CODES
+# ----------------------------------------------------------------------------#
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({
@@ -297,10 +261,3 @@ if not app.debug:
 # Default port:
 if __name__ == '__main__':
     app.run()
-
-# Or specify port manually:
-'''
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
-'''
