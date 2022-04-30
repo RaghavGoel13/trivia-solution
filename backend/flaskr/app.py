@@ -141,18 +141,17 @@ def add_question():
 # ----------------------------------------------------------------------------#
 # SEARCH QUESTIONS ENDPOINT
 # ----------------------------------------------------------------------------#
-@app.route("/search", methods=['POST'])
+@app.route("/questions/search", methods=['POST'])
 def search_question():
     body = request.get_json()
-    search = body.get('searchTerm')
-    searched_question = Question.query.filter(Question.question.ilike('%' + search + '%')).all()
-
-    if searched_question:
-        current_questions = paginate_questions(request, searched_question)
+    search_ques = body.get('searchTerm', None)
+    if search_ques:
+        searched_question = Question.query.filter(Question.question.ilike(f'%{search_ques}%')).all()
         return jsonify({
             'success': True,
-            'questions': current_questions,
-            'total_questions': len(searched_question)
+            'questions': [question.format() for question in searched_question],
+            'total_questions': len(searched_question),
+            'current_category': None
         })
     else:
         abort(404)
