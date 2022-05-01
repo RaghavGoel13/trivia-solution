@@ -84,7 +84,7 @@ The API will return three error types when requests fail:
     - Request Arguments: page - integer
     - Returns: An object with 10 paginated questions, total questions, object including all categories, and current
       category string
-    - Sample: `curl http://127.0.0.1:5000//questions?page=2'
+    - Sample: `curl http://127.0.0.1:5000/questions?page=2'
 
 ```
   {
@@ -127,7 +127,7 @@ The API will return three error types when requests fail:
       category.
     - Request Arguments: None
     - Returns: An object with a single key, categories, that contains an object of id: category_string key:value pairs.
-    - Sample: `curl http://127.0.0.1:5000//categories'
+    - Sample: `curl http://127.0.0.1:5000/categories'
 
 ```
     {
@@ -158,7 +158,7 @@ The API will return three error types when requests fail:
     - Fetch questions for a category specified by id request argument.
     - Request Arguments: id - integer
     - Returns: An object with questions for the specified category, total questions, and current category string
-    - Sample: `curl http://127.0.0.1:5000//categories/1/questions'
+    - Sample: `curl http://127.0.0.1:5000/categories/1/questions'
 
 ```
     {
@@ -316,7 +316,7 @@ The API will return three error types when requests fail:
       { 'searchTerm': 'this is the term the user is looking for' }
     - Returns: any array of questions, a number of totalQuestions that met the search term and the current category
       string.
-    - Sample: `curl -x POST http://127.0.0.1:5000//questions/search -H "Content-Type: application/json -d '{ '
+    - Sample: `curl -x POST http://127.0.0.1:5000/questions/search -H "Content-Type: application/json -d '{ '
       searchTerm': 'this is the term the user is looking for' }' {
 
  ```
