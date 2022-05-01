@@ -2,9 +2,8 @@
 # Imports
 # ----------------------------------------------------------------------------#
 import random
-from logging import FileHandler, Formatter
 
-from flask import Flask, abort, jsonify, logging, request
+from flask import Flask, abort, jsonify, request
 from flask_cors import CORS
 
 from models import setup_db, Category, Question
@@ -65,13 +64,12 @@ def retrieve_categories():
 # ----------------------------------------------------------------------------#
 @app.route('/questions')
 def get_questions():
+    all_questions = Question.query.order_by(Question.id).all()
+    total_questions = len(all_questions)
+    pagenated_questions = paginate_questions(request, all_questions)
+    if (len(pagenated_questions) == 0):
+        abort(404)
     try:
-        all_questions = Question.query.order_by(Question.id).all()
-        total_questions = len(all_questions)
-        pagenated_questions = paginate_questions(request, all_questions)
-
-        if (len(pagenated_questions) == 0):
-            abort(404)
 
         categories = Category.query.all()
         categoriesDict = {}
@@ -103,6 +101,7 @@ def delete_questions(id):
 
             return jsonify({
                 'success': True,
+                'deleted': str(id)
             })
     except Exception as e:
         print(e)
@@ -115,13 +114,12 @@ def delete_questions(id):
 @app.route("/questions", methods=['POST'])
 def add_question():
     body = request.get_json()
-    new_question = body.get('question', None)
-    new_answer = body.get('answer', None)
-    new_category = body.get('category', None)
-    new_difficulty = body.get('difficulty', None)
+    new_question = body.get('question')
+    new_answer = body.get('answer')
+    new_category = body.get('category')
+    new_difficulty = body.get('difficulty')
     try:
-        added_question = Question(question=new_question, answer=new_answer, category=new_category,
-                                  difficulty=new_difficulty)
+        added_question = Question(question=new_question, answer=new_answer, category=new_category,difficulty=new_difficulty)
         added_question.insert()
 
         all_questions = Question.query.order_by(Question.id).all()
@@ -185,7 +183,8 @@ def get_quiz():
     body = request.get_json()
     quiz_category = body.get('quiz_category')
     previous_question = body.get('previous_questions')
-
+    if quiz_category is None:
+        abort(422)
     try:
         if (quiz_category['id'] == 0):
             # To handle all categories
@@ -243,16 +242,6 @@ def bad_request(error):
     }), 400
 
 
-if not app.debug:
-    file_handler = FileHandler('error.log')
-    file_handler.setFormatter(
-        Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
-    )
-    app.logger.setLevel(logging.INFO)
-    file_handler.setLevel(logging.INFO)
-    app.logger.addHandler(file_handler)
-    app.logger.info('errors')
-
 # ----------------------------------------------------------------------------#
 # Launch.
 # ----------------------------------------------------------------------------#
@@ -260,3 +249,7 @@ if not app.debug:
 # Default port:
 if __name__ == '__main__':
     app.run()
+
+
+def create_app():
+    return app
