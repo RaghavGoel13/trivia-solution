@@ -70,7 +70,6 @@ def get_questions():
     if (len(pagenated_questions) == 0):
         abort(404)
     try:
-
         categories = Category.query.all()
         categoriesDict = {}
         for category in categories:
@@ -119,7 +118,8 @@ def add_question():
     new_category = body.get('category')
     new_difficulty = body.get('difficulty')
     try:
-        added_question = Question(question=new_question, answer=new_answer, category=new_category,difficulty=new_difficulty)
+        added_question = Question(question=new_question, answer=new_answer, category=new_category,
+                                  difficulty=new_difficulty)
         added_question.insert()
 
         all_questions = Question.query.order_by(Question.id).all()
@@ -199,11 +199,11 @@ def get_quiz():
             return jsonify({
                 'success': True,
                 'question': {
-                    "answer": next_question.answer,
-                    "category": next_question.category,
-                    "difficulty": next_question.difficulty,
                     "id": next_question.id,
-                    "question": next_question.question
+                    "question": next_question.question,
+                    "answer": next_question.answer,
+                    "difficulty": next_question.difficulty,
+                    "category": next_question.category
                 },
                 'previousQuestion': previous_question
             })
