@@ -113,27 +113,31 @@ def delete_questions(id):
 @app.route("/questions", methods=['POST'])
 def add_question():
     body = request.get_json()
-    new_question = body.get('question')
-    new_answer = body.get('answer')
-    new_category = body.get('category')
-    new_difficulty = body.get('difficulty')
-    try:
-        added_question = Question(question=new_question, answer=new_answer, category=new_category,
-                                  difficulty=new_difficulty)
-        added_question.insert()
+    if body is None:
+        abort(400)
+    new_question = body.get('question', None)
+    new_answer = body.get('answer', None)
+    new_category = body.get('category', None)
+    new_difficulty = body.get('difficulty', None)
+    if new_question is None or new_answer is None or new_category is None or new_difficulty is None:
+        abort(400)
+    else:
+        try:
+            added_question = Question(question=new_question, answer=new_answer, category=new_category,
+                                      difficulty=new_difficulty)
+            added_question.insert()
+            all_questions = Question.query.order_by(Question.id).all()
+            current_questions = paginate_questions(request, all_questions)
+            return jsonify({
+                'success': True,
+                'created': added_question.id,
+                'questions': current_questions,
+                'total_questions': len(all_questions)
+            })
 
-        all_questions = Question.query.order_by(Question.id).all()
-        current_questions = paginate_questions(request, all_questions)
-        return jsonify({
-            'success': True,
-            'created': added_question.id,
-            'questions': current_questions,
-            'total_questions': len(all_questions)
-        })
-
-    except Exception as e:
-        print(e)
-        abort(422)
+        except Exception as e:
+            print(e)
+            abort(422)
 
 
 # ----------------------------------------------------------------------------#

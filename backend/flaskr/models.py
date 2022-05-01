@@ -1,9 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
-
 from sqlalchemy import Column, String, Integer
 
-database_name = "postgres"
-database_path = "postgres://postgres:admin@{}/{}".format('localhost:5432', database_name)
+from backend.settings import DB_NAME, DB_USER, DB_PASSWORD
+
+database_path = "postgres://{}:{}@{}/{}".format(DB_USER, DB_PASSWORD, 'localhost:5432', DB_NAME)
 db = SQLAlchemy()
 
 

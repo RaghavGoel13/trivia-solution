@@ -4,6 +4,7 @@ import unittest
 from flask_sqlalchemy import SQLAlchemy
 
 from app import create_app
+from backend.settings import DB_NAME, DB_USER, DB_PASSWORD
 from models import setup_db, Question
 
 
@@ -11,9 +12,7 @@ class TriviaTestCase(unittest.TestCase):
     def setUp(self):
         self.app = create_app()
         self.client = self.app.test_client
-        self.database_name = "postgres"
-        self.database_path = "postgres://postgres:admin@{}/{}".format(
-            'localhost:5432', self.database_name)
+        self.database_path = "postgres://{}:{}@{}/{}".format(DB_USER, DB_PASSWORD, 'localhost:5432', DB_NAME)
         setup_db(self.app, self.database_path)
 
         # binds the app to the current context
@@ -114,7 +113,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["success"], True)
         self.assertEqual(total_questions_after, total_questions_before + 1)
 
-    def test_422_add_question_with_missing_payload(self):
+    def test_400_add_question_with_missing_payload(self):
         new_question = {
             'question': 'new_question',
             'answer': 'new_answer',
@@ -123,9 +122,9 @@ class TriviaTestCase(unittest.TestCase):
         res = self.client().post('/questions', json=new_question)
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 422)
+        self.assertEqual(res.status_code, 400)
         self.assertEqual(data["success"], False)
-        self.assertEqual(data["message"], "Unprocessable entity")
+        self.assertEqual(data["message"], "Bad request")
 
     def test_search_questions(self):
         new_search = {'searchTerm': 'a'}
